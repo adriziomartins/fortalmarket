@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#124e45">
+  <meta name="description" content="Fortal Market: descubra o comércio do seu bairro em um só lugar. Protótipo demonstrativo.">
+  <title>Fortal Market | Seu bairro em um só lugar</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <div class="demo-banner" role="note">VERSÃO DEMONSTRATIVA · Comerciantes, produtos e preços fictícios · Nenhuma compra real é realizada</div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="Fortal Market, início"><span class="brand-symbol" aria-hidden="true">F</span><span><strong>fortal<span class="brand-accent">market</span></strong><small>Seu bairro em um só lugar</small></span></a>
+      <button class="cart-toggle" id="abrir-carrinho" type="button" aria-controls="carrinho"><span aria-hidden="true">🛍️</span> Meu pedido <span class="cart-count" id="contador">0</span></button>
+    </div>
+  </header>
+  <main id="conteudo">
+    <section class="hero">
+      <div class="container hero-layout">
+        <div>
+          <p class="eyebrow">COMÉRCIO LOCAL, VIDA MAIS PRÁTICA</p>
+          <h1>O que você precisa está <em>perto de casa.</em></h1>
+          <p class="hero-lead">Encontre mercados, comida pronta e produtos do dia a dia nos comércios do seu bairro, sem perder tempo procurando de loja em loja.</p>
+          <div class="search-panel">
+            <label for="busca">O que você está procurando?</label>
+            <div class="search-field"><span aria-hidden="true">⌕</span><input id="busca" type="search" placeholder="Ex.: arroz, shampoo, bobó de camarão" autocomplete="off"></div>
+            <label for="territorio">Explorar território</label>
+            <select id="territorio">
+              <option value="todos">Todos os territórios do protótipo</option>
+              <option value="castelo">Castelo Encantado · Vicente Pinzón</option>
+              <option value="serviluz">Serviluz</option>
+            </select>
+          </div>
+        </div>
+        <div class="hero-illustration" aria-hidden="true">
+          <span class="hero-big">🏡</span><span class="floating floating-one">🧴</span><span class="floating floating-two">🛒</span><span class="floating floating-three">🍲</span>
+          <p>Do mercadinho<br>à cozinha da vizinhança.</p>
+        </div>
+      </div>
+    </section>
+    <section class="container catalog-section" aria-labelledby="catalog-title">
+      <div class="section-heading"><div><p class="eyebrow">EXPLORE O BAIRRO</p><h2 id="catalog-title">Produtos por perto</h2></div><p id="resultado-contagem" role="status" aria-live="polite"></p></div>
+      <div class="chips" id="categorias" role="group" aria-label="Filtrar categoria"></div>
+      <div class="products" id="produtos"></div>
+      <p class="no-results" id="sem-resultados" hidden>Nenhum produto encontrado neste filtro. Experimente outra busca ou território.</p>
+    </section>
+    <section class="how-it-works"><div class="container"><p class="eyebrow">SIMPLES ASSIM</p><h2>Como o Fortal Market funciona</h2><div class="steps"><article><span>01</span><h3>Escolha o bairro</h3><p>Explore os estabelecimentos da sua região ou de territórios próximos.</p></article><article><span>02</span><h3>Encontre produtos</h3><p>Busque o que precisa e monte uma lista por estabelecimento.</p></article><article><span>03</span><h3>Combine diretamente</h3><p>No futuro, envie seu pedido ao WhatsApp do lojista para confirmar estoque, preço e entrega.</p></article></div></div></section>
+  </main>
+  <aside class="cart-panel" id="carrinho" aria-labelledby="carrinho-titulo" aria-hidden="true" inert>
+    <div class="cart-header"><div><p class="eyebrow">SEU CARRINHO</p><h2 id="carrinho-titulo">Meu pedido</h2></div><button class="icon-button" id="fechar-carrinho" type="button" aria-label="Fechar carrinho">×</button></div>
+    <p class="cart-store" id="loja-carrinho"></p>
+    <div id="itens-carrinho" class="cart-items"></div>
+    <div class="cart-bottom"><div class="subtotal"><span>Subtotal demonstrativo</span><strong id="subtotal">R$ 0,00</strong></div><p class="cart-note">Preço, estoque, pagamento e taxa de entrega precisam de confirmação do comerciante. Este protótipo não faz pedidos reais.</p><button class="primary-button" id="copiar-pedido" type="button">Copiar lista de pedido</button><p id="mensagem-carrinho" role="status" aria-live="polite"></p></div>
+  </aside>
+  <div class="overlay" id="sobreposicao" hidden></div>
+  <footer class="site-footer"><div class="container footer-inner"><strong>fortalmarket</strong><p>Protótipo de marketplace hiperlocal · Fortaleza, CE</p><a href="https://github.com/adriziomartins/fortalmarket">Código no GitHub</a></div></footer>
+</body>
+</html>
