@@ -1,0 +1,60 @@
+name: Verificação do MVP estático
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - feat/mvp-v0.1-prototipo
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Versão Node disponível
+        run: node --version
+      - name: Verificar sintaxe
+        run: node --check app.js
+      - name: Testar estrutura do protótipo
+        run: node --test tests/smoke.test.cjs
+      - name: Gerar artefatos de publicação
+        run: bash scripts/build.sh
+      - name: Verificar saída
+        run: |
+          test -s dist/index.html
+          test -s dist/styles.css
+          test -s dist/app.js
+          test -s dist/_headers
+
+  browser-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Instalar Playwright (apenas para testes)
+        run: npm install --no-save --no-audit --no-fund playwright@1.56.1
+      - name: Preparar Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Gerar saída estática
+        run: bash scripts/build.sh
+      - name: Iniciar servidor e executar testes de navegador
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory dist > /tmp/fortalmarket-http.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:4173/ > /dev/null; then break; fi
+            sleep 1
+          done
+          node --test tests/browser.test.cjs
+      - name: Salvar capturas de desktop e celular
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fortalmarket-browser-screenshots
+          path: test-artifacts/
+          if-no-files-found: ignore
