@@ -29,7 +29,7 @@ Abra `http://localhost:8000` no navegador.
 
 ### Publicação
 
-Este é um site estático (HTML, CSS e JavaScript). Pode ser publicado em um serviço de hospedagem estática, como Cloudflare Pages. Nenhum deploy ou domínio personalizado foi configurado pelo código.
+Este é um site estático (HTML, CSS e JavaScript). Pode ser publicado como site estático em Cloudflare Workers usando o arquivo `wrangler.jsonc` e a pasta `dist/`. O deploy depende da configuração do Worker no painel Cloudflare; o domínio personalizado ainda não está configurado.
 
 ### Próximos passos
 

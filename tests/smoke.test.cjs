@@ -40,3 +40,10 @@ test("layout responsivo e headers de pré-lançamento estão presentes", () => {
   assert.match(headers, /X-Robots-Tag: noindex, nofollow/);
   assert.match(headers, /Content-Security-Policy:/);
 });
+
+test("Worker está configurado para publicar os arquivos em dist", () => {
+  const wrangler = JSON.parse(fs.readFileSync("wrangler.jsonc", "utf8"));
+  assert.equal(wrangler.name, "fortalmarket");
+  assert.equal(wrangler.assets.directory, "./dist");
+  assert.ok(/^20\d{2}-\d{2}-\d{2}$/.test(wrangler.compatibility_date));
+});
