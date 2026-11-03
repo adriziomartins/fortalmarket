@@ -18,6 +18,7 @@
     ["limpeza", "🧽 Limpeza"], ["beleza", "🧴 Beleza"]
   ];
   const state = { categoria: "todos", carrinho: new Map(), loja: null };
+  let focoAnteriorCarrinho = null;
   const $ = (id) => document.getElementById(id);
   const dinheiro = (n) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n);
   const normalizar = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -36,18 +37,26 @@
     b.addEventListener("click", acao);
     return b;
   }
+  function atualizarCategorias() {
+    $("categorias").querySelectorAll("button[data-categoria]").forEach((b) => {
+      const selecionada = b.dataset.categoria === state.categoria;
+      b.classList.toggle("active", selecionada);
+      b.setAttribute("aria-pressed", String(selecionada));
+    });
+  }
   function renderizarCategorias() {
     const alvo = $("categorias");
     alvo.replaceChildren();
     categorias.forEach(([id, nome]) => {
-      const b = botao(nome, "chip" + (state.categoria === id ? " active" : ""), () => {
+      const b = botao(nome, "chip", () => {
         state.categoria = id;
-        renderizarCategorias();
+        atualizarCategorias();
         renderizarProdutos();
       });
-      b.setAttribute("aria-pressed", String(state.categoria === id));
+      b.dataset.categoria = id;
       alvo.append(b);
     });
+    atualizarCategorias();
   }
   function renderizarProdutos() {
     const termo = normalizar($("busca").value.trim());
@@ -128,6 +137,7 @@
     $("copiar-pedido").disabled = !quantidadeTotal();
   }
   function abrirCarrinho() {
+    focoAnteriorCarrinho = document.activeElement;
     $("carrinho").classList.add("open");
     $("carrinho").removeAttribute("inert");
     $("carrinho").setAttribute("aria-hidden", "false");
@@ -141,7 +151,9 @@
     $("carrinho").setAttribute("aria-hidden", "true");
     $("sobreposicao").hidden = true;
     document.body.style.overflow = "";
-    $("abrir-carrinho").focus();
+    const destino = focoAnteriorCarrinho && focoAnteriorCarrinho.isConnected ? focoAnteriorCarrinho : $("abrir-carrinho");
+    focoAnteriorCarrinho = null;
+    destino.focus();
   }
   async function copiarPedido() {
     if (!quantidadeTotal()) return;
@@ -169,7 +181,26 @@
   $("fechar-carrinho").addEventListener("click", fecharCarrinho);
   $("sobreposicao").addEventListener("click", fecharCarrinho);
   $("copiar-pedido").addEventListener("click", copiarPedido);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("carrinho").classList.contains("open")) fecharCarrinho(); });
+  document.addEventListener("keydown", (e) => {
+    if (!$("carrinho").classList.contains("open")) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      fecharCarrinho();
+      return;
+    }
+    if (e.key !== "Tab") return;
+    const focaveis = Array.from($("carrinho").querySelectorAll("button:not([disabled])"));
+    if (!focaveis.length) return;
+    const primeiro = focaveis[0];
+    const ultimo = focaveis[focaveis.length - 1];
+    if (e.shiftKey && document.activeElement === primeiro) {
+      e.preventDefault();
+      ultimo.focus();
+    } else if (!e.shiftKey && document.activeElement === ultimo) {
+      e.preventDefault();
+      primeiro.focus();
+    }
+  });
   renderizarCategorias();
   renderizarProdutos();
   renderizarCarrinho();
