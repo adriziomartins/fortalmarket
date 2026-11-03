@@ -115,7 +115,7 @@ test("lista copiada informa que não representa compra real", async () => {
   try {
     await page.getByRole("button", { name: "Adicionar Arroz 1 kg ao pedido" }).click();
     await page.locator("#copiar-pedido").click();
-    assert.match(await page.locator("#mensagem-carrinho").innerText(), /copiada/);
+    await page.locator("#mensagem-carrinho").getByText("Lista demonstrativa copiada para a área de transferência.").waitFor({ state: "visible", timeout: 5000 });
     const texto = await page.evaluate(() => navigator.clipboard.readText());
     assert.match(texto, /LISTA DE TESTE/);
     assert.match(texto, /1x Arroz 1 kg/);
@@ -132,7 +132,11 @@ test("larguras desktop e celular não produzem rolagem horizontal", async () => 
         pageWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth
       }));
-      assert.ok(size.pageWidth <= size.viewportWidth + 1, "overflow em " + viewport.width + "px");
+      const offenders = await page.evaluate(() => Array.from(document.querySelectorAll("body *")).filter(el => {
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && (rect.right > window.innerWidth + 1 || rect.left < -1);
+      }).slice(0, 8).map(el => ({tag: el.tagName, className: String(el.className), text: (el.textContent || "").slice(0, 30)})));
+      assert.ok(size.pageWidth <= size.viewportWidth + 1, "overflow em " + viewport.width + "px: " + JSON.stringify(offenders));
       if (viewport.width !== 320) {
         await page.screenshot({
           path: path.join(process.cwd(), "test-artifacts", viewport.width === 1280 ? "desktop.png" : "mobile.png"),
