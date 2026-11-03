@@ -71,11 +71,11 @@ Métricas complementares: buscas sem resultado, cliques de contato, taxa de conf
 
 ## Decisões técnicas provisórias
 
-- Repositório: \`adriziomartins/fortalmarket\`.
+- Repositório: `adriziomartins/fortalmarket`.
 - Prototipação: HTML + CSS + JavaScript sem dependências e sem backend, para lançamento e validação rápidos.
 - Migração para React/TypeScript, banco de dados e PWA instalável será considerada apenas quando o piloto demonstrar necessidade.
 - Hospedagem: serviço de hosting estático; GitHub é repositório de código, não o serviço comercial de hospedagem escolhido.
-- Domínio planejado: \`fortalmarket.com.br\`, ainda sem confirmação de compra.
+- Domínio planejado: `fortalmarket.com.br`, ainda sem confirmação de compra.
 
 ## Próxima iteração
 
