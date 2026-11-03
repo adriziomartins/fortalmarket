@@ -21,11 +21,11 @@ Plataforma hiperlocal para descoberta de produtos, estabelecimentos e serviços,
 
 Não é necessário instalar dependências. Na pasta do projeto, execute:
 
-\`\`\`bash
+```bash
 python3 -m http.server 8000
-\`\`\`
+```
 
-Abra \`http://localhost:8000\` no navegador.
+Abra `http://localhost:8000` no navegador.
 
 ### Publicação
 
@@ -45,4 +45,4 @@ Veja [escopo e critérios do MVP](docs/MVP.md).
 
 [github.com/adriziomartins/fortalmarket](https://github.com/adriziomartins/fortalmarket)
 
-Domínio planejado: \`fortalmarket.com.br\` (a disponibilidade informada não significa registro efetuado).
+Domínio planejado: `fortalmarket.com.br` (a disponibilidade informada não significa registro efetuado).
