@@ -22,6 +22,12 @@ jobs:
         run: node --check app.js
       - name: Testar estrutura do protótipo
         run: node --test tests/smoke.test.cjs
+      - name: Validar ferramenta interna de comerciantes
+        run: |
+          node --check tools/onboarding/app.js
+          node --check scripts/validate-submission.cjs
+          node scripts/validate-submission.cjs data/examples/merchant-submission.sample.json
+          node --test tests/onboarding.test.cjs
       - name: Gerar artefatos de publicação
         run: bash scripts/build.sh
       - name: Verificar saída
