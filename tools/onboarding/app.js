@@ -68,7 +68,7 @@
         trade_name: name, official_neighborhood: bairro, locality: localidade,
         primary_category: categoria,
         description: valor("descricao"), opening_hours_text: valor("horario"),
-        public_whatsapp: whatsapp ? (whatsapp.startsWith("55") ? whatsapp : "55" + whatsapp) : "",
+        public_whatsapp: whatsapp ? (whatsapp.length === 11 ? "55" + whatsapp : whatsapp) : "",
         service_area_text: valor("atendimento"), fulfillment: methods,
         publication_status: "draft", authorization_status: "pending"
       },
