@@ -32,11 +32,11 @@ Referências oficiais:
 
 ## 3. Tarefa piloto — documentação do deploy
 
-Issue do primeiro ensaio: a ser vinculada na OPS-001. Não utilizar PR #3 como ensaio inicial.
+Issue do primeiro ensaio: https://github.com/adriziomartins/fortalmarket/issues/6 (DOCS-001). Não utilizar PR #3 como ensaio inicial.
 
 Copie o comando abaixo na tarefa do ambiente Codex:
 
-> Trabalhe no repositório adriziomartins/fortalmarket. Leia AGENTS.md, README.md, docs/MVP.md, docs/DEPLOY.md, docs/OPERACAO_DESENVOLVIMENTO.md e a issue designada. Faça somente a correção documental indicada na issue: deixe claro quais instruções de implantação Cloudflare são históricas e quais passos precisam ser verificados no painel atual. Não modifique app.js, CSS, HTML, Worker, DNS, CI, workflows, branches ou infraestrutura. Faça branch docs/ própria; use evidências verificáveis, não suponha a configuração remota. Execute os testes do repositório quando aplicáveis e registre qualquer impossibilidade. Abra PR em rascunho com escopo, testes, risco e rollback. Não faça merge nem deploy.
+> Trabalhe no repositório adriziomartins/fortalmarket. Leia AGENTS.md, README.md, docs/MVP.md, docs/DEPLOY.md, docs/OPERACAO_DESENVOLVIMENTO.md e a Issue #6. Faça somente a correção documental indicada na issue: deixe claro quais instruções de implantação Cloudflare são históricas e quais passos precisam ser verificados no painel atual. Não modifique app.js, CSS, HTML, Worker, DNS, CI, workflows, branches ou infraestrutura. Faça branch docs/ própria; use evidências verificáveis, não suponha a configuração remota. Execute os testes do repositório quando aplicáveis e registre qualquer impossibilidade. Abra PR em rascunho com escopo, testes, risco e rollback. Não faça merge nem deploy.
 
 ## 4. Validação da execução
 
