@@ -39,7 +39,7 @@ Não trate propostas de funcionalidades, relatos de conversas ou dados demonstra
 
 **Proibido:** divulgar segredos ou dados privados em commits/logs/PRs; contornar testes e proteções; fazer afirmações de aprovação sem evidência; converter dados fictícios em reais sem autorização; criar cobranças automaticamente.
 
-Agent Lee ou qualquer agente de infraestrutura deve permanecer inicialmente em modo somente leitura: pode analisar configurações, inventariar riscos e sugerir mudanças, mas não executar mutações até autorização específica.
+Qualquer agente de infraestrutura deve permanecer inicialmente em modo somente leitura: pode analisar configurações, inventariar riscos e sugerir mudanças, mas não executar alterações até autorização específica.
 
 ## Comandos de verificação existentes
 
