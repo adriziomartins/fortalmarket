@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fortal Market | Cadastro assistido (interno)</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#163b34;background:#f4f8f4}*{box-sizing:border-box}body{margin:0}main{max-width:850px;margin:0 auto;padding:24px 18px 65px}h1{font-size:clamp(28px,6vw,40px);margin:10px 0 8px;line-height:1.14}h2{font-size:21px;margin:0 0 15px}.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#237a59;font-weight:800}.lead{color:#526e62;line-height:1.65}.notice{padding:16px;background:#fff5db;border:1px solid #ead18a;border-radius:12px;line-height:1.55;font-size:14px}.panel{background:#fff;border:1px solid #dce8df;padding:22px;border-radius:16px;margin-top:18px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:flex;flex-direction:column;gap:6px}.wide{grid-column:1/-1}label{font-size:13px;font-weight:750}input,textarea,select{border:1px solid #b9cec0;border-radius:9px;padding:11px;width:100%;font:inherit;color:inherit;background:#fff}input:focus-visible,textarea:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #efb84e;outline-offset:2px}.hint{font-size:12px;color:#617f70}.options{display:flex;flex-wrap:wrap;gap:20px;margin-top:9px}.options label{display:flex;gap:8px;align-items:center}.options input{width:auto}.product-row{display:grid;grid-template-columns:2fr 1fr 1.1fr auto;align-items:end;gap:10px;padding:14px 0;border-bottom:1px solid #ecf1eb}.product-row button{margin-bottom:1px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}button{padding:11px 15px;border-radius:9px;border:1px solid #bfd4c7;background:#fff;color:#124e45;font-weight:750;cursor:pointer}button.primary{background:#124e45;color:white;border-color:#124e45}button:hover{filter:brightness(.96)}.status{min-height:24px;margin:12px 0;font-weight:650;line-height:1.5}.status.error{color:#a52e26}.status.ok{color:#176e4e}footer{font-size:12px;color:#5e7a6c;margin-top:26px}.footer-link{color:#124e45}@media(max-width:600px){.fields{grid-template-columns:1fr}.product-row{grid-template-columns:1fr 1fr}.product-row .field:first-child{grid-column:1/-1}main{padding:19px 13px}.panel{padding:16px}.product-row button{grid-column:1/-1}}@media(max-width:340px){.options{gap:12px}}
+</style>
+<script src="./app.js" defer></script>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Fortal Market · ferramenta interna</div>
+  <h1>Ficha assistida de comerciante</h1>
+  <p class="lead">Prepare uma ficha de pré-cadastro para conversar com comerciantes da região. Os dados ficam neste navegador até você baixar um arquivo JSON.</p>
+  <p class="notice"><strong>Não é cadastro público e não publica ofertas.</strong> Esta página não envia dados à internet, não salva no servidor e não substitui autorização documentada. Evite dados pessoais e endereços residenciais. Guarde o arquivo exportado em local privado.</p>
+  <form id="ficha" novalidate>
+    <section class="panel" aria-labelledby="estabelecimento-titulo">
+      <h2 id="estabelecimento-titulo">1. Estabelecimento</h2>
+      <div class="fields">
+        <div class="field wide"><label for="nome">Nome fantasia comercial *</label><input id="nome" name="nome" required maxlength="100" placeholder="Ex.: Mercado Exemplo"></div>
+        <div class="field"><label for="bairro">Bairro oficial *</label><input id="bairro" name="bairro" required maxlength="80" value="Vicente Pinzón"></div>
+        <div class="field"><label for="localidade">Comunidade ou localidade *</label><input id="localidade" name="localidade" required maxlength="80" value="Castelo Encantado"></div>
+        <div class="field"><label for="categoria">Categoria principal *</label><select id="categoria" required><option value="">Selecione...</option><option value="mercado">Mercado / mercearia</option><option value="refeicoes">Comida pronta</option><option value="limpeza">Limpeza</option><option value="beleza">Beleza e higiene</option><option value="farmacia">Farmácia</option><option value="outros">Outros</option></select></div>
+        <div class="field"><label for="horario">Horário comercial (texto)</label><input id="horario" maxlength="160" placeholder="Ex.: seg–sáb, 8h às 18h"></div>
+        <div class="field wide"><label for="descricao">Descrição curta do comércio</label><textarea id="descricao" rows="2" maxlength="280" placeholder="Que produtos oferece?"></textarea></div>
+        <div class="field"><label for="whatsapp">WhatsApp comercial público (opcional)</label><input id="whatsapp" inputmode="tel" autocomplete="off" placeholder="DDD + número, ex.: 859XXXXXXXX"></div>
+        <div class="field"><label for="atendimento">Área de atendimento (texto)</label><input id="atendimento" maxlength="160" placeholder="Ex.: Castelo Encantado e Serviluz"></div>
+      </div>
+      <fieldset style="border:0;padding:0;margin-top:17px">
+        <legend style="font-size:13px;font-weight:750">Modalidades disponíveis</legend>
+        <div class="options">
+          <label><input type="checkbox" id="retirada" checked> Retirada</label>
+          <label><input type="checkbox" id="entrega"> Entrega pelo estabelecimento</label>
+        </div>
+      </fieldset>
+    </section>
+    <section class="panel" aria-labelledby="produtos-titulo">
+      <h2 id="produtos-titulo">2. Produtos para conferência</h2>
+      <p class="hint">Os preços informados são rascunhos; só poderão aparecer publicamente após confirmação de preço, disponibilidade e autorização.</p>
+      <div id="produtos"></div>
+      <div class="actions"><button id="adicionar-produto" type="button">+ Adicionar produto</button></div>
+    </section>
+    <section class="panel" aria-labelledby="revisao-titulo">
+      <h2 id="revisao-titulo">3. Revisão e exportação</h2>
+      <p class="hint">Todas as fichas são exportadas com status <strong>rascunho</strong> e autorização <strong>pendente</strong>. Uma autorização expressa precisa ser guardada separadamente antes da ativação.</p>
+      <div class="actions"><button class="primary" type="submit">Baixar ficha JSON</button><button id="limpar" type="button">Limpar ficha</button></div>
+      <p id="resultado" role="status" aria-live="polite" class="status"></p>
+    </section>
+  </form>
+  <footer>Ferramenta local para operação piloto · <a class="footer-link" href="https://github.com/adriziomartins/fortalmarket">Fortal Market</a></footer>
+</main>
+</body>
+</html>
