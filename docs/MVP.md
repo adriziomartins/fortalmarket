@@ -9,7 +9,7 @@ Moradores nem sempre conhecem o comércio de sua região, os produtos disponíve
 
 ## Hipótese
 
-Se moradores puderem buscar produtos por bairro, visualizar ofertas claras e entrar em contato diretamente com estabelecimentos próximos, conseguirão localizar itens úteis com menos esforço, e comerciantes receberão novas solicitações sem pagar comissões iniciais à plataforma.
+Se moradores puderem buscar produtos por bairro, visualizar ofertas claras e entrar em contato diretamente com estabelecimentos próximos, conseguirão localizar itens úteis com menos esforço, e comerciantes receberão novas solicitações sob condições comerciais ainda sujeitas à aprovação do operador.
 
 ## Público e território de validação
 
@@ -45,7 +45,7 @@ Se moradores puderem buscar produtos por bairro, visualizar ofertas claras e ent
 
 ## Regras fundamentais
 
-- **Taxa da plataforma:** R$ 0 para consumidor e comerciante no piloto.
+- **Taxas e comissões:** hipóteses pendentes de aprovação explícita do operador; não oferecer gratuidade ou condições comerciais antes dessa decisão.
 - **Frete:** informado e cobrado pelo comerciante, quando aplicável.
 - **Preço:** deve conter data/hora de confirmação e pode mudar; não exibir oferta como garantida sem atualização.
 - **Estoque:** confirmado pelo comerciante antes do pedido definitivo.
