@@ -44,3 +44,24 @@ test("ferramenta interna não é copiada para dist no script de build", () => {
   assert.match(build,/cp index\.html styles\.css app\.js _headers dist\//);
   assert.doesNotMatch(build,/tools\/onboarding/);
 });
+test("identificadores, vínculos e imagens não podem burlar o rascunho", () => {
+  for (const mutate of [
+    x => { delete x.merchant.id; },
+    x => { x.products[0].merchant_id = "outro-comercio"; },
+    x => { x.products.push({...x.products[0]}); },
+    x => { x.products[0].image = "https://example.org/foto.jpg"; },
+    x => { x.merchant.logo_authorization_status = "approved"; },
+    x => { x.products[0].price_verified_at = "2026-11-09"; },
+    x => { x.products[0].description = "x".repeat(281); }
+  ]) {
+    const x = clone(); mutate(x); assert.ok(validar(x).length);
+  }
+});
+test("limites de produtos e estados de revisão", () => {
+  const x = clone();
+  x.products = Array.from({length:50}, (_, i) => ({...model.products[0], id: `product-demo-${i}`}));
+  assert.deepEqual(validar(x), []);
+  x.products.push({...model.products[0],id:"product-demo-51"});
+  assert.ok(validar(x).some(e => e.includes("1 a 50")));
+  x.products = []; assert.ok(validar(x).length);
+});

@@ -9,9 +9,12 @@ function validar(obj) {
   req(isObj(obj), "Objeto JSON esperado");
   if (!isObj(obj)) return errors;
   req(obj.schema_version === "0.2", "schema_version deve ser 0.2");
+  const id = v => typeof v === "string" && /^[a-zA-Z0-9][a-zA-Z0-9-]{7,79}$/.test(v);
   const m = obj.merchant;
   req(isObj(m), "merchant é obrigatório");
   if (isObj(m)) {
+    req(id(m.id), "merchant.id inválido");
+    req(m.logo === null && m.logo_authorization_status === "pending", "merchant.logo deve permanecer ausente e pendente");
     for (const [k,max] of [["trade_name",100],["official_neighborhood",80],["locality",80],["primary_category",32]]) {
       req(str(m[k],max) && m[k].trim().length > 0, "merchant." + k + " é obrigatório e tem limite de caracteres");
     }
@@ -23,10 +26,16 @@ function validar(obj) {
     req(m.authorization_status === "pending", "merchant.authorization_status deve ser pending nesta etapa");
   }
   req(Array.isArray(obj.products) && obj.products.length >= 1 && obj.products.length <= 50, "products precisa conter 1 a 50 itens");
+  const ids = new Set();
   if (Array.isArray(obj.products)) obj.products.forEach((p,i) => {
     const k = "products[" + i + "]";
     req(isObj(p), k + " deve ser objeto");
     if (!isObj(p)) return;
+    req(id(p.id) && !ids.has(p.id), k + ".id inválido ou duplicado");
+    ids.add(p.id);
+    req(isObj(m) && p.merchant_id === m.id, k + ".merchant_id inválido");
+    req(str(p.description,280), k + ".description inválida");
+    req(p.image === null && p.image_authorization_status === "pending", k + ".image deve permanecer ausente e pendente");
     req(str(p.name,110) && p.name.trim().length > 0, k + ".name é obrigatório");
     req(["un","kg","g","l","ml","porcao","pacote"].includes(p.unit), k + ".unit inválida");
     req(Number.isSafeInteger(p.price_cents) && p.price_cents > 0 && p.price_cents <= 99999999, k + ".price_cents deve ser inteiro positivo");

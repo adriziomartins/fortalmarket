@@ -13,7 +13,10 @@
       "pickup"
     ],
     "publication_status": "draft",
-    "authorization_status": "pending"
+    "authorization_status": "pending",
+    "id": "merchant-demo-001",
+    "logo": null,
+    "logo_authorization_status": "pending"
   },
   "products": [
     {
@@ -22,7 +25,12 @@
       "price_cents": 650,
       "status": "draft",
       "availability": "unconfirmed",
-      "price_verified_at": null
+      "price_verified_at": null,
+      "id": "product-demo-001",
+      "merchant_id": "merchant-demo-001",
+      "description": "Produto fictício para teste.",
+      "image": null,
+      "image_authorization_status": "pending"
     }
   ],
   "internal_review": {
