@@ -88,7 +88,7 @@ test("320px, teclado, limite e foco ao remover produto", async () => {
     assert.equal(await page.locator('.product-row').count(),50);
     assert.match(await page.locator('#resultado').innerText(), /Máximo de 50/);
     assert.equal(await page.locator('#resultado').evaluate(e=>e===document.activeElement),true);
-    await page.locator('.product-row button').last().click();
+    await page.getByRole('button',{name:'Remover',exact:true}).last().click();
     assert.equal(await page.locator('#adicionar-produto').evaluate(e=>e===document.activeElement),true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     fs.mkdirSync('test-artifacts',{recursive:true});
@@ -119,7 +119,7 @@ test("exportação repetida mantém IDs, texto inerte e nenhum envio ou persist�
     assert.deepEqual(validar(a),[]);
     assert.deepEqual(network,[]);
     assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
-    assert.equal(await page.locator('.product-row img').count(),0);
+    assert.equal(await page.locator('.product-row img[src]').count(),0);
     page.once('dialog', d=>d.accept());
     await page.locator('#limpar').click();
     assert.equal(await page.locator('#nome').inputValue(),'');
@@ -146,8 +146,64 @@ test("rejeita telefone curto, preços inválidos e ausência de modalidade/produ
     await page.getByRole('button',{name:'Baixar ficha JSON'}).click();
     assert.match(await page.locator('#resultado').innerText(), /modalidade/);
     await page.locator('#retirada').check();
-    await page.locator('.product-row button').click();
+    await page.getByRole('button',{name:'Remover',exact:true}).click();
     await page.getByRole('button',{name:'Baixar ficha JSON'}).click();
     assert.match(await page.locator('#resultado').innerText(), /ao menos um produto/);
   } finally { await context.close(); }
+});
+
+test("fotos opcionais: prévia local, metadados pendentes, remoção e limpeza sem rede", async () => {
+  const {context,page,errors} = await abrirFormulario();
+  const requests=[];
+  page.on('request', r=>{if (/^https?:/.test(r.url())) requests.push(r.url());});
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64');
+  try {
+    await page.setViewportSize({width:320,height:700});
+    await page.locator('#nome').fill('Comércio fictício');
+    await page.locator('#categoria').selectOption('mercado');
+    await page.locator('.product-row [name="nome"]').fill('Produto fictício');
+    await page.locator('.product-row [name="preco"]').fill('1,50');
+    const fachada=page.getByLabel('Foto da fachada (opcional)',{exact:true});
+    const produto=page.getByLabel('Foto do produto (opcional)',{exact:true});
+    for (const [input,name] of [[fachada,'fachada-ficticia.png'],[produto,'produto-ficticio.png']]) {
+      await input.setInputFiles({name,mimeType:'image/png',buffer:png});
+    }
+    await page.waitForFunction(()=>[...document.querySelectorAll('.photo-field img')].every(i=>i.complete && i.naturalWidth>0));
+    assert.equal(await page.locator('.photo-field img[src^="blob:"]').count(),2);
+    const primeiraUrl = await produto.evaluate(e => e.closest('.photo-field').querySelector('img').src);
+    await produto.setInputFiles({name:'produto-substituido.png',mimeType:'image/png',buffer:png});
+    await page.waitForFunction(()=>document.querySelector('.product-row img').naturalWidth>0);
+    assert.notEqual(await page.locator('.product-row img').getAttribute('src'), primeiraUrl);
+    for (const width of [1280,390,320]) {
+      await page.setViewportSize({width,height:800});
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      fs.mkdirSync('test-artifacts',{recursive:true});
+      await page.screenshot({path:`test-artifacts/onboarding-fotos-${width}.png`,fullPage:true});
+    }
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    const [download]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Baixar ficha JSON'}).click()]);
+    const data=JSON.parse(fs.readFileSync(await download.path(),'utf8'));
+    assert.deepEqual(data.merchant.facade_image,{file_name:'fachada-ficticia.png',mime_type:'image/png',authorization_status:'pending'});
+    assert.deepEqual(data.products[0].image,{file_name:'produto-substituido.png',mime_type:'image/png',authorization_status:'pending'});
+    assert.deepEqual(validar(data),[]);
+    assert.doesNotMatch(JSON.stringify(data),/blob:|base64|fakepath/);
+    await page.getByRole('button',{name:'Remover foto do produto',exact:true}).click();
+    assert.equal(await produto.evaluate(e=>e===document.activeElement),true);
+    assert.equal(await page.locator('.product-row img[src]').count(),0);
+    await produto.setInputFiles({name:'vazia.png',mimeType:'image/png',buffer:Buffer.alloc(0)});
+    assert.match(await page.locator('#resultado').innerText(),/Imagem inválida/);
+    await produto.setInputFiles({name:'arquivo.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg/>')});
+    assert.match(await page.locator('#resultado').innerText(),/Imagem inválida/);
+    await produto.setInputFiles({name:'grande.png',mimeType:'image/png',buffer:Buffer.alloc(5*1024*1024+1)});
+    assert.match(await page.locator('#resultado').innerText(),/Imagem inválida/);
+    await produto.setInputFiles({name:'corrompida.png',mimeType:'image/png',buffer:Buffer.from('invalida')});
+    await page.waitForFunction(()=>document.querySelector('#resultado').textContent.includes('Não foi possível visualizar'));
+    page.once('dialog',d=>d.accept());
+    await page.locator('#limpar').click();
+    assert.equal(await page.locator('.photo-field img[src]').count(),0);
+    assert.equal(await fachada.inputValue(),'');
+    assert.deepEqual(requests,[]);
+    assert.deepEqual(errors,[]);
+    assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
+  } finally {await context.close();}
 });

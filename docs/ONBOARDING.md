@@ -66,7 +66,7 @@ Referência operacional: [Issue #2](https://github.com/adriziomartins/fortalmark
 
 - IDs de comerciante e produto são gerados uma vez por ficha/linha e preservados em downloads repetidos. O produto referencia `merchant_id`. Limpar ou recarregar inicia outra ficha; não há importação nem persistência. Para revisão posterior, preservar os IDs no arquivo privado.
 - `products[].description` aceita texto opcional. `price_verified_at` permanece `null` e disponibilidade `unconfirmed`: o preço digitado é apenas informado, não uma confirmação com data.
-- Logo e foto ficam `null`, com autorização `pending`. Arquivos, URLs e provas de autorização não são coletados nesta etapa; exigem revisão privada e autorização documentada antes de uso público.
+- Logo permanece `null`, com autorização `pending`. Fachada e foto de produto podem ser selecionadas localmente para revisão interna; provas de autorização continuam fora da ferramenta e exigem revisão privada antes de uso público.
 - Horário, contato e área podem ficar vazios em rascunho. Endereço comercial e identificação de responsáveis pelo atendimento/resolução ficam para conferência privada posterior, evitando coleta prematura de dados pessoais.
 - Antes de ativar: conferir cada campo com o comerciante, registrar responsável e canal para problemas, data de confirmação de preço/estoque, cobertura, frete e retirada; obter autorização granular de nome, logo, endereço comercial, horário, WhatsApp e fotos, com possibilidade de correção/retirada.
 - Desativação rápida depende de catálogo público futuro: exigir remoção de loja/produto a pedido do responsável ou quando desatualizado, antes de habilitar publicação. Não existe ativação neste formulário.
@@ -75,3 +75,27 @@ Referência operacional: [Issue #2](https://github.com/adriziomartins/fortalmark
 A ferramenta atende somente à preparação técnica. O aceite operacional da Issue #2 continua pendente de autorizações, catálogo revisado e política comercial aprovada. Use apenas dados fictícios nos testes; coleta real exige autorização própria.
 
 O formato experimental `0.2` agora exige IDs, descrição (pode ser vazia) e estados de imagem. Fichas anteriores precisam de adequação privada ao contrato e nova validação; não há migração automática nem alteração de autorizações.
+
+
+## Fotos locais para revisão interna — v0.2.1
+
+A foto da fachada e uma foto por produto são opcionais. Aceita-se JPEG, PNG ou WebP, até 5 MB por imagem. A prévia usa uma URL temporária `blob:` da memória do navegador; não há upload, backend ou persistência. Remover/substituir foto, remover produto ou limpar ficha libera as URLs correspondentes. Fechar/recarregar descarta as seleções.
+
+O JSON exporta `merchant.facade_image` e `products[].image` como `null` quando não há seleção, ou somente:
+
+```json
+{"file_name":"foto-ficticia.png","mime_type":"image/png","authorization_status":"pending"}
+```
+
+Não inclui binário, base64, URL temporária, caminho completo ou EXIF. Guarde o arquivo original separadamente em armazenamento privado: o JSON não permite reconstruir a imagem e nomes iguais não identificam necessariamente o mesmo arquivo. Evite nomes de arquivo com informações pessoais; o nome é incluído na ficha privada. A seleção não comprova autoria, consentimento ou autorização de publicação. Nenhuma imagem será publicada automaticamente.
+
+O campo `merchant.facade_image` ausente continua válido para fichas anteriores. `products[].image: null` permanece compatível. O validador aceita somente os três metadados acima com estado `pending`; rejeita conteúdo embutido, URLs, caminhos e estados aprovados. A validação do JSON não verifica o conteúdo do arquivo original. A prévia rejeita formatos não aceitos, arquivos vazios, maiores que o limite ou que o navegador não consiga decodificar.
+
+Riscos: muitas imagens grandes podem consumir memória em aparelhos modestos; o limite por imagem não limita o total de uma ficha. Originais podem conter dados pessoais/EXIF e exigem revisão privada e autorização própria antes de qualquer uso real. Testes desta alteração usam apenas PNG sintético em memória.
+
+
+Consolidação v0.2.1: o operador informou a homologação do formulário e da exportação de metadados. Este escopo substitui a proposta anterior de incorporar imagens ao JSON no comentário de 13/11 do PR #3. Não há exportação ZIP nesta etapa. A homologação técnica não encerra o aceite operacional da Issue #2 nem autoriza coleta ou publicação real.
+
+Ao guardar os originais, mantenha em local privado uma correspondência entre o ID do comerciante/produto no JSON e o arquivo selecionado. Confira essa correspondência antes de fechar a ficha; não há importação ou recuperação automática das fotos pelo formulário. Para substituir uma foto, selecione outro arquivo no mesmo campo; para retirar, use “Remover foto”.
+
+Verificação da consolidação: sintaxe, exemplo fictício, smoke, testes de onboarding, build e testes Chromium conforme o workflow do repositório. Os cenários de fotos cobrem prévia, substituição, remoção, exportação de metadados pendentes, rejeição de arquivos vazios/inválidos/grandes/corrompidos e ausência de rede/persistência. Capturas de 320, 390 e 1280 px ficam em `test-artifacts/`, ignorado pelo Git. Resultados efetivamente executados e checks do SHA consolidado são registrados no PR #3. Sem teste em aparelho físico, leitor de tela, conexão lenta ou URL pública.

@@ -11,6 +11,43 @@
   };
   let merchantId = crypto.randomUUID();
   const el = (tag, properties = {}) => Object.assign(document.createElement(tag), properties);
+  const fotos = new Map();
+  function campoFoto(label, id) {
+    const wrap = el("div", { className: "field wide photo-field" });
+    const input = el("input", { type: "file", id, accept: "image/jpeg,image/png,image/webp" });
+    const hint = el("p", { id: id + "-hint", className: "hint", textContent: "Apenas revisão interna · autorização pendente. JPEG, PNG ou WebP, até 5 MB. O JSON guarda só nome e tipo; guarde o original separadamente em local privado. Evite nomes de arquivo com dados pessoais." });
+    input.setAttribute("aria-describedby", hint.id);
+    const preview = el("img", { alt: "Prévia local: " + label, hidden: true });
+    const remove = el("button", { type: "button", textContent: "Remover " + label.toLowerCase(), hidden: true });
+    const state = { metadata: null, url: null, clear(resetInput = true) {
+      if (state.url) URL.revokeObjectURL(state.url);
+      state.url = null; state.metadata = null; if (resetInput) input.value = "";
+      preview.removeAttribute("src"); preview.hidden = true; remove.hidden = true;
+    } };
+    fotos.set(input, state);
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      state.clear(false);
+      if (!file) return;
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || !file.size || file.size > 5 * 1024 * 1024 || !file.name.trim() || file.name.length > 255 || /[\\/\x00-\x1f\x7f]/.test(file.name)) {
+        state.clear();
+        exibir("Imagem inválida. Escolha JPEG, PNG ou WebP de até 5 MB, com nome simples de até 255 caracteres.", true); return;
+      }
+      state.metadata = { file_name: file.name, mime_type: file.type, authorization_status: "pending" };
+      state.url = URL.createObjectURL(file);
+      preview.src = state.url; preview.hidden = false; remove.hidden = false;
+      exibir("Imagem selecionada apenas para revisão interna. Autorização pendente; somente metadados serão exportados.");
+    });
+    preview.addEventListener("error", () => { state.clear(); exibir("Não foi possível visualizar a imagem. Selecione um arquivo JPEG, PNG ou WebP válido.", true); });
+    remove.addEventListener("click", () => { state.clear(); input.focus(); exibir("Imagem removida."); });
+    wrap.append(el("label", { htmlFor: id, textContent: label + " (opcional)" }), input, hint, preview, remove);
+    return wrap;
+  }
+  function limparFotos(root) {
+    for (const input of root.querySelectorAll('input[type="file"]')) {
+      fotos.get(input).clear(); fotos.delete(input);
+    }
+  }
   function campo(label, name, tipo, placeholder = "") {
     const wrap = el("div", { className: "field" });
     const id = "p-" + name + "-" + crypto.randomUUID();
@@ -38,9 +75,9 @@
     valor.querySelector("input").inputMode = "decimal";
     const descricao = campo("Descrição do produto (opcional)", "descricao", "text");
     descricao.classList.add("wide");
-    linha.append(nome, unidade, valor, descricao);
+    linha.append(nome, unidade, valor, descricao, campoFoto("Foto do produto", "foto-produto-" + linha.dataset.id));
     const botao = el("button", { type: "button", textContent: "Remover" });
-    botao.addEventListener("click", () => { linha.remove(); $("adicionar-produto").focus(); exibir("Produto removido."); });
+    botao.addEventListener("click", () => { limparFotos(linha); linha.remove(); $("adicionar-produto").focus(); exibir("Produto removido."); });
     linha.append(botao);
     produtos.append(linha);
     if (focar) nome.querySelector("input").focus();
@@ -66,12 +103,12 @@
       const unidade = linha.querySelector('[name="unidade"]').value;
       const preco = moedaEmCentavos(linha.querySelector('[name="preco"]').value);
       if (!nomeProduto || preco === null || preco <= 0) throw new Error("Produto " + (i + 1) + ": informe nome e preço válido maior que zero, usando vírgula nos centavos.");
-      return { id: linha.dataset.id, merchant_id: merchantId, description: linha.querySelector('[name="descricao"]').value.trim(), image_authorization_status: "pending", image: null, name: nomeProduto, unit: unidade, price_cents: preco, status: "draft", availability: "unconfirmed", price_verified_at: null };
+      return { id: linha.dataset.id, merchant_id: merchantId, description: linha.querySelector('[name="descricao"]').value.trim(), image_authorization_status: "pending", image: fotos.get(linha.querySelector('input[type="file"]')).metadata, name: nomeProduto, unit: unidade, price_cents: preco, status: "draft", availability: "unconfirmed", price_verified_at: null };
     });
     return {
       schema_version: "0.2",
       merchant: {
-        id: merchantId, logo: null, logo_authorization_status: "pending",
+        id: merchantId, facade_image: fotos.get($("foto-fachada")).metadata, logo: null, logo_authorization_status: "pending",
         trade_name: name, official_neighborhood: bairro, locality: localidade,
         primary_category: categoria,
         description: valor("descricao"), opening_hours_text: valor("horario"),
@@ -101,7 +138,10 @@
   $("limpar").addEventListener("click", () => {
     if (!window.confirm("Descartar todos os dados digitados nesta ficha?")) return;
     merchantId = crypto.randomUUID();
+    for (const state of fotos.values()) state.clear();
+    limparFotos(produtos);
     $("ficha").reset(); produtos.replaceChildren(); adicionarProduto(); exibir("Ficha limpa.");
   });
+  $("foto-fachada-container").append(campoFoto("Foto da fachada", "foto-fachada"));
   adicionarProduto(false);
 })();

@@ -10,9 +10,13 @@ function validar(obj) {
   if (!isObj(obj)) return errors;
   req(obj.schema_version === "0.2", "schema_version deve ser 0.2");
   const id = v => typeof v === "string" && /^[a-zA-Z0-9][a-zA-Z0-9-]{7,79}$/.test(v);
+  const imagem = v => v === null || (isObj(v) && Object.keys(v).length === 3 &&
+    str(v.file_name,255) && v.file_name.trim().length > 0 && !/[\\/\x00-\x1f\x7f]/.test(v.file_name) &&
+    ["image/jpeg", "image/png", "image/webp"].includes(v.mime_type) && v.authorization_status === "pending");
   const m = obj.merchant;
   req(isObj(m), "merchant é obrigatório");
   if (isObj(m)) {
+    req(m.facade_image === undefined || imagem(m.facade_image), "merchant.facade_image deve conter apenas metadados pendentes ou null");
     req(id(m.id), "merchant.id inválido");
     req(m.logo === null && m.logo_authorization_status === "pending", "merchant.logo deve permanecer ausente e pendente");
     for (const [k,max] of [["trade_name",100],["official_neighborhood",80],["locality",80],["primary_category",32]]) {
@@ -35,7 +39,7 @@ function validar(obj) {
     ids.add(p.id);
     req(isObj(m) && p.merchant_id === m.id, k + ".merchant_id inválido");
     req(str(p.description,280), k + ".description inválida");
-    req(p.image === null && p.image_authorization_status === "pending", k + ".image deve permanecer ausente e pendente");
+    req(imagem(p.image) && p.image_authorization_status === "pending", k + ".image deve conter apenas metadados pendentes ou null");
     req(str(p.name,110) && p.name.trim().length > 0, k + ".name é obrigatório");
     req(["un","kg","g","l","ml","porcao","pacote"].includes(p.unit), k + ".unit inválida");
     req(Number.isSafeInteger(p.price_cents) && p.price_cents > 0 && p.price_cents <= 99999999, k + ".price_cents deve ser inteiro positivo");

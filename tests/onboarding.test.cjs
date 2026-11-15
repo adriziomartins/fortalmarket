@@ -65,3 +65,25 @@ test("limites de produtos e estados de revisão", () => {
   assert.ok(validar(x).some(e => e.includes("1 a 50")));
   x.products = []; assert.ok(validar(x).length);
 });
+
+test("fotos locais aceitam somente metadados pendentes, mantendo fichas anteriores", () => {
+  const foto = {file_name:"foto-ficticia.png", mime_type:"image/png", authorization_status:"pending"};
+  const x = clone();
+  x.merchant.facade_image = {...foto}; x.products[0].image = {...foto};
+  assert.deepEqual(validar(x), []);
+  for (const alvo of [x.merchant, x.products[0]]) {
+    const campo = alvo === x.merchant ? 'facade_image' : 'image';
+    for (const invalida of [
+      {...foto, authorization_status:'approved'}, {...foto, mime_type:'image/svg+xml'},
+      {...foto, file_name:'../privado.png'}, {...foto, file_name:'C:\\privado.png'},
+      {...foto, file_name:''}, {...foto, file_name:'x'.repeat(256)},
+      {...foto, data:'base64'}, {...foto, url:'https://example.org/foto.png'},
+      'data:image/png;base64,AAAA'
+    ]) {
+      alvo[campo] = invalida; assert.ok(validar(x).length);
+    }
+    alvo[campo] = {...foto};
+  }
+  x.merchant.authorization_status = 'approved';
+  assert.ok(validar(x).length);
+});
