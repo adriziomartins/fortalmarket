@@ -22,6 +22,12 @@ jobs:
         run: node --check app.js
       - name: Testar estrutura do protótipo
         run: node --test tests/smoke.test.cjs
+      - name: Validar ferramenta interna de comerciantes
+        run: |
+          node --check tools/onboarding/app.js
+          node --check scripts/validate-submission.cjs
+          node scripts/validate-submission.cjs data/examples/merchant-submission.sample.json
+          node --test tests/onboarding.test.cjs
       - name: Gerar artefatos de publicação
         run: bash scripts/build.sh
       - name: Verificar saída
@@ -50,7 +56,7 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ > /dev/null; then break; fi
             sleep 1
           done
-          node --test tests/browser.test.cjs
+          node --test tests/browser.test.cjs tests/onboarding-browser.test.cjs
       - name: Salvar capturas de desktop e celular
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

@@ -1,0 +1,10 @@
+# Arquivos privados de pré-cadastro: nunca publicar em repositório.
+private/
+drafts/
+rascunho-*.json
+merchant-submission-*.json
+!data/examples/merchant-submission.sample.json
+node_modules/
+dist/
+test-artifacts/
+.DS_Store

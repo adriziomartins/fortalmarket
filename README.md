@@ -46,3 +46,15 @@ Veja [escopo e critérios do MVP](docs/MVP.md).
 [github.com/adriziomartins/fortalmarket](https://github.com/adriziomartins/fortalmarket)
 
 Domínio planejado: `fortalmarket.com.br` (a disponibilidade informada não significa registro efetuado).
+## MVP v0.2 — Preparação de comerciantes (em desenvolvimento)
+
+Existe uma ferramenta de **cadastro assistido local**, fora do site público, em [tools/onboarding/index.html](tools/onboarding/index.html). Ela permite preparar uma ficha em JSON com produtos e dados comerciais, sem enviar informações à internet. As fichas são sempre **rascunho** e **não autorizam divulgação**.
+
+Veja [o processo de autorização e revisão](docs/ONBOARDING.md). Valide uma ficha demonstrativa com:
+
+```bash
+node scripts/validate-submission.cjs data/examples/merchant-submission.sample.json
+node --test tests/onboarding.test.cjs
+```
+
+**Atenção:** não adicione dados reais sem autorização ao repositório público.
